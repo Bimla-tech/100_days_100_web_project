@@ -5,375 +5,150 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Expense Tracker - Analytics Dashboard</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Load Chart.js CDN for clean, automated graphics rendering -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* --- Modern Dashboard UI Framework Styles --- */
-        :root {
-            --card-bg: #ffffff;
-            --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.08);
-            --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
-            --radius-md: 12px;
-            --radius-lg: 16px;
-            --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        [data-theme="dark"] {
-            --card-bg: #1e293b;
-            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Full width dashboard layout spacing metrics */
-        .dashboard-layout-wrapper {
-            width: 100%;
-            margin-top: 24px;
-            box-sizing: border-box;
-        }
-
-        /* 2-Column Core Stats Box Layout */
-        .stats-summary-row {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        .premium-stat-box {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color, #e2e8f0);
-            border-radius: var(--radius-md);
-            padding: 20px;
-            box-shadow: var(--shadow-sm);
-            transition: var(--transition-smooth);
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .premium-stat-box:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-
-        .stat-label {
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-weight: 600;
-            color: var(--text-sub, #64748B);
-        }
-
-        .stat-value {
-            font-size: 1.75rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            line-height: 1.2;
-        }
-
-        /* Main Visual Graphs Grid Frame */
-        .charts-responsive-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 24px;
-            align-items: start;
-        }
-
-        @media (min-width: 768px) {
-            .charts-responsive-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        /* Clean Content Card Architecture */
-        .premium-chart-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color, #e2e8f0);
-            border-radius: var(--radius-lg);
-            padding: 24px;
-            box-shadow: var(--shadow-sm);
-            transition: var(--transition-smooth);
-        }
-
-        .premium-chart-card h2 {
-            margin: 0 0 16px 0;
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-main, #0f172a);
-            letter-spacing: -0.01em;
-        }
-
-        /* Sandbox Frame For Floating Canvas Renderers */
-        .chart-viewport-box {
-            position: relative;
-            width: 100%;
-            height: 320px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Clean UX Empty-State Placeholder Alert styling */
-        .ux-empty-placeholder {
-            color: var(--text-sub, #64748B);
-            font-size: 0.95rem;
-            text-align: center;
-            max-width: 280px;
-            line-height: 1.5;
-            padding: 48px 16px;
-            border: 2px dashed var(--border-color, #e2e8f0);
-            border-radius: var(--radius-md);
-            background: rgba(248, 250, 252, 0.05);
-        }
+        .dashboard-layout-wrapper { width: 100%; margin-top: 24px; }
+        .stats-summary-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+        @media (min-width: 768px) { .stats-summary-row { grid-template-columns: repeat(4, 1fr); } }
+        .premium-stat-box { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; box-shadow: var(--shadow-sm); transition: all 0.25s; display: flex; flex-direction: column; gap: 6px; }
+        .premium-stat-box:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .stat-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; color: var(--text-sub); }
+        .stat-value { font-size: 1.65rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; }
+        .stat-sub-label { font-size: 0.72rem; color: var(--text-sub); margin-top: 2px; }
+        .charts-responsive-grid { display: grid; grid-template-columns: 1fr; gap: 24px; align-items: start; }
+        @media (min-width: 768px) { .charts-responsive-grid { grid-template-columns: 1fr 1fr; } }
+        .premium-chart-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; box-shadow: var(--shadow-sm); }
+        .premium-chart-card h2 { margin: 0 0 16px 0; font-size: 1.05rem; font-weight: 600; color: var(--text-main); }
+        .chart-viewport-box { position: relative; width: 100%; height: 300px; display: flex; align-items: center; justify-content: center; }
+        .ux-empty-placeholder { color: var(--text-sub); font-size: 0.9rem; text-align: center; max-width: 260px; line-height: 1.6; padding: 40px 16px; border: 2px dashed var(--border-color); border-radius: 12px; }
     </style>
 </head>
 <body>
     <div class="app-container">
-        <!-- App Header Area (Preserved precisely from your codebase template layout) -->
         <header class="app-header">
             <div class="logo-group">
                 <h1>Expense <span class="logo-accent">Tracker</span></h1>
                 <p class="logo-subtext">Your money, kept simple.</p>
             </div>
-            
-            <!-- Integrated Navigation Pill Box and Utilities Controls Group -->
             <div class="header-controls">
                 <nav class="nav-links-group">
                     <a href="index.html" class="nav-link">Transactions</a>
                     <a href="dashboard.html" class="nav-link active">Dashboard</a>
-                    <a href="history.html" class="nav-link">History Log</a>
+                    <a href="history.html" class="nav-link">History <span class="nav-badge" data-badge="count">0</span></a>
                 </nav>
-                
                 <div class="utility-buttons">
-                    <button id="btnExport" class="btn-secondary" aria-label="Copy backup pack">Backup</button>
-                    <button id="btnReset" class="btn-danger" aria-label="Reset database data">Clear All</button>
+                    <button id="btnExport" class="btn-secondary">Backup</button>
+                    <button id="btnReset" class="btn-danger">Clear All</button>
                 </div>
             </div>
         </header>
 
-        <!-- Main Workspace Framing Elements Grid -->
         <main class="dashboard-layout-wrapper">
-            
-            <!-- Strategic Summary Metric Boxes Grid block -->
             <section class="stats-summary-row">
-                <div class="premium-stat-box" style="border-left: 4px solid var(--green-success, #10b981);">
+                <div class="premium-stat-box" style="border-left:4px solid var(--green-success);">
                     <div class="stat-label">Total Earned</div>
                     <div id="totalIncome" class="stat-value text-green">₹0.00</div>
                 </div>
-                <div class="premium-stat-box" style="border-left: 4px solid var(--red-error, #ef4444);">
+                <div class="premium-stat-box" style="border-left:4px solid var(--red-error);">
                     <div class="stat-label">Total Spent</div>
                     <div id="totalExpense" class="stat-value text-red">₹0.00</div>
                 </div>
+                <div class="premium-stat-box" style="border-left:4px solid var(--brand-color);">
+                    <div class="stat-label">Net Balance</div>
+                    <div id="netBalance" class="stat-value">₹0.00</div>
+                </div>
+                <div class="premium-stat-box" style="border-left:4px solid var(--blue-info);">
+                    <div class="stat-label">Savings Rate</div>
+                    <div id="savingsRateDash" class="stat-value text-blue">0%</div>
+                    <div class="stat-sub-label">of total income saved</div>
+                </div>
             </section>
 
-            <!-- Dual Component Split Row Graph Frame blocks -->
             <div class="charts-responsive-grid">
-                <!-- Visual Card One: Cash Activity Timeline Graph Grid item -->
                 <section class="premium-chart-card">
-                    <h2>Cash Flow Trends</h2>
-                    <div class="chart-viewport-box" id="trendWrapper">
-                        <canvas id="trendChart"></canvas>
-                    </div>
+                    <h2>📈 Cash Flow Trends</h2>
+                    <div class="chart-viewport-box" id="trendWrapper"><canvas id="trendChart"></canvas></div>
                 </section>
-
-                <!-- Visual Card Two: Category Split Distribution Circle item -->
                 <section class="premium-chart-card">
-                    <h2>Expense Allocation</h2>
-                    <div class="chart-viewport-box" id="categoryWrapper">
-                        <canvas id="categoryChart"></canvas>
-                    </div>
+                    <h2>🥧 Expense Allocation</h2>
+                    <div class="chart-viewport-box" id="categoryWrapper"><canvas id="categoryChart"></canvas></div>
                 </section>
             </div>
-
         </main>
     </div>
 
-    <!-- Floating Layout Mode Toggle Trigger Anchor Button -->
-    <button id="themeToggle" class="floating-theme-btn" aria-label="Toggle dark and light mode">🌓</button>
+    <div id="toast-container"></div>
+    <button id="themeToggle" class="floating-theme-btn">🌓</button>
 
     <script>
-        // Global variables to hold active chart instances safely without layout memory leaking
-        let trendChartInstance = null;
-        let categoryChartInstance = null;
-
-        // Dynamic Color Token Extraction Utility
-        function fetchCSSColorToken(variableName, alternativeHex) {
-            return getComputedStyle(document.documentElement).getPropertyValue(variableName).trim() || alternativeHex;
+        let trendChartInstance = null, categoryChartInstance = null;
+        function getCSSVar(n,f){return getComputedStyle(document.documentElement).getPropertyValue(n).trim()||f;}
+        function showToast(message, type='info'){
+            let c=document.getElementById('toast-container');
+            const icons={success:'✅',error:'❌',info:'ℹ️'};
+            const t=document.createElement('div');
+            t.className=`toast toast-${type}`;
+            t.innerHTML=`<span class="toast-icon">${icons[type]||icons.info}</span><span>${message}</span>`;
+            c.appendChild(t);
+            setTimeout(()=>{t.classList.add('toast-exit');t.addEventListener('animationend',()=>t.remove(),{once:true});},3000);
         }
-
-        function compileAndBuildAnalyticsLayout() {
-            // Read transactional array via your specific budgetbuddy storage key model
-            const records = JSON.parse(localStorage.getItem('budgetbuddy_data')) || [];
-
-            let earnedTotal = 0;
-            let spentTotal = 0;
-            const categoryTotals = { Food: 0, Travel: 0, Shopping: 0, Bills: 0, Others: 0 };
-            const timelineMap = {};
-
-            // Parse live object records matrix metrics
-            records.forEach(item => {
-                const amount = parseFloat(item.amount) || 0;
-                const dateKey = item.date || 'No Date';
-
-                if (!timelineMap[dateKey]) {
-                    timelineMap[dateKey] = { income: 0, expenses: 0 };
-                }
-
-                if (item.type === 'Income') {
-                    earnedTotal += amount;
-                    timelineMap[dateKey].income += amount;
-                } else {
-                    spentTotal += amount;
-                    timelineMap[dateKey].expenses += amount;
-                    
-                    if (categoryTotals.hasOwnProperty(item.category)) {
-                        categoryTotals[item.category] += amount;
-                    } else {
-                        categoryTotals['Others'] += amount;
-                    }
-                }
+        function buildDashboard(){
+            const records=JSON.parse(localStorage.getItem('budgetbuddy_data'))||[];
+            let earned=0,spent=0;
+            const cats={Food:0,Travel:0,Shopping:0,Bills:0,Others:0};
+            const tmap={};
+            records.forEach(item=>{
+                const amt=parseFloat(item.amount)||0;
+                const dk=item.date||'No Date';
+                if(!tmap[dk])tmap[dk]={income:0,expenses:0};
+                if(item.type==='Income'){earned+=amt;tmap[dk].income+=amt;}
+                else{spent+=amt;tmap[dk].expenses+=amt;if(cats.hasOwnProperty(item.category))cats[item.category]+=amt;else cats.Others+=amt;}
             });
-
-            // Format numbers to Indian Currency rules matching your interface model standard
-            const rupeeFormatter = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' });
-            document.getElementById('totalIncome').textContent = rupeeFormatter.format(earnedTotal);
-            document.getElementById('totalExpense').textContent = rupeeFormatter.format(spentTotal);
-
-            const trendWrapper = document.getElementById('trendWrapper');
-            const categoryWrapper = document.getElementById('categoryWrapper');
-
-            // Handle clean fallback presentation layer look if dataset is empty
-            if (records.length === 0) {
-                trendWrapper.innerHTML = '<div class="ux-empty-placeholder">No transaction history found. Add some records to generate analytical trends!</div>';
-                categoryWrapper.innerHTML = '<div class="ux-empty-placeholder">No category distributions available. Log an expense item to track.</div>';
+            const fmt=new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR'});
+            const net=earned-spent;
+            const sr=earned>0?Math.max(0,(net/earned)*100):0;
+            document.getElementById('totalIncome').textContent=fmt.format(earned);
+            document.getElementById('totalExpense').textContent=fmt.format(spent);
+            const ne=document.getElementById('netBalance');
+            ne.textContent=fmt.format(net);ne.className=`stat-value ${net>=0?'text-green':'text-red'}`;
+            document.getElementById('savingsRateDash').textContent=`${sr.toFixed(1)}%`;
+            document.querySelectorAll('.nav-badge[data-badge="count"]').forEach(b=>b.textContent=records.length);
+            const tw=document.getElementById('trendWrapper'),cw=document.getElementById('categoryWrapper');
+            if(trendChartInstance){trendChartInstance.destroy();trendChartInstance=null;}
+            if(categoryChartInstance){categoryChartInstance.destroy();categoryChartInstance=null;}
+            if(!records.length){
+                tw.innerHTML='<div class="ux-empty-placeholder">📊 No transactions yet. Add records to see trends!</div>';
+                cw.innerHTML='<div class="ux-empty-placeholder">🥧 No category data yet. Log an expense to start tracking.</div>';
                 return;
             }
-
-            // Fresh canvas instantiation resets to completely avoid internal rendering glitches
-            trendWrapper.innerHTML = '<canvas id="trendChart"></canvas>';
-            categoryWrapper.innerHTML = '<canvas id="categoryChart"></canvas>';
-
-            // Load colors from system context variables parameters
-            const textColorMain = fetchCSSColorToken('--text-main', '#0f172a');
-            const textColorSub = fetchCSSColorToken('--text-sub', '#64748b');
-            const borderColorGrid = fetchCSSColorToken('--border-color', '#e2e8f0');
-
-            // Set chronology axis sequencing arrays
-            const sortedDates = Object.keys(timelineMap).sort((a, b) => new Date(a) - new Date(b));
-            
-            const humanReadableDates = sortedDates.map(dateStr => {
-                const [year, month, day] = dateStr.split('-');
-                if(!year || !month || !day) return dateStr;
-                return new Date(year, month - 1, day).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+            tw.innerHTML='<canvas id="trendChart"></canvas>';
+            cw.innerHTML='<canvas id="categoryChart"></canvas>';
+            const tm=getCSSVar('--text-main','#0f172a'),ts=getCSSVar('--text-sub','#64748b'),bg=getCSSVar('--border-color','#e2e8f0');
+            const sd=Object.keys(tmap).sort((a,b)=>new Date(a)-new Date(b));
+            const hd=sd.map(d=>{const p=d.split('-');return p.length!==3?d:new Date(p[0],p[1]-1,p[2]).toLocaleDateString('en-IN',{day:'numeric',month:'short'});});
+            trendChartInstance=new Chart(document.getElementById('trendChart').getContext('2d'),{type:'line',data:{labels:hd,datasets:[{label:'Income',data:sd.map(d=>tmap[d].income),borderColor:'#10b981',backgroundColor:'rgba(16,185,129,0.08)',borderWidth:2.5,tension:0.3,pointRadius:4,fill:true},{label:'Expenses',data:sd.map(d=>tmap[d].expenses),borderColor:'#ef4444',backgroundColor:'rgba(239,68,68,0.07)',borderWidth:2.5,tension:0.3,pointRadius:4,fill:true}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:tm,font:{family:'inherit',size:12,weight:'500'}}}},scales:{x:{grid:{color:bg},ticks:{color:ts}},y:{grid:{color:bg},ticks:{color:ts}}}}});
+            const ac=Object.keys(cats).filter(k=>cats[k]>0);
+            if(!ac.length){cw.innerHTML='<div class="ux-empty-placeholder">🥧 No categorical expenses yet.</div>';}
+            else{categoryChartInstance=new Chart(document.getElementById('categoryChart').getContext('2d'),{type:'doughnut',data:{labels:ac,datasets:[{data:ac.map(k=>cats[k]),backgroundColor:['#38bdf8','#fb923c','#f43f5e','#34d399','#a78bfa'],borderWidth:0,hoverOffset:8}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{color:tm,padding:16,font:{family:'inherit',size:12}}}},cutout:'70%'}});}
+        }
+        document.addEventListener('DOMContentLoaded',()=>{
+            const s=localStorage.getItem('budgetbuddy_theme');
+            document.documentElement.setAttribute('data-theme',s||(window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
+            buildDashboard();
+            document.getElementById('btnReset').addEventListener('click',()=>{if(confirm('Delete all entries?')){localStorage.removeItem('budgetbuddy_data');buildDashboard();showToast('All data cleared.','error');}});
+            document.getElementById('btnExport').addEventListener('click',()=>{
+                const data=JSON.parse(localStorage.getItem('budgetbuddy_data')||'[]');
+                if(!data.length){showToast('No data yet!','info');return;}
+                const csv=[['Date','Type','Category','Description','Amount'].join(','),...data.map(i=>[i.date,i.type,i.category,`"${String(i.description||'').replace(/"/g,'""')}"`,i.amount].join(','))].join('\n');
+                const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=`Backup_${new Date().toISOString().slice(0,10)}.csv`;document.body.appendChild(a);a.click();document.body.removeChild(a);
+                showToast('Backup downloaded!','success');
             });
-
-            const incomeTimelineValues = sortedDates.map(date => timelineMap[date].income);
-            const expenseTimelineValues = sortedDates.map(date => timelineMap[date].expenses);
-
-            // --- CHART 1: TIMELINE TREND LINE GRAPH ---
-            const ctxTrend = document.getElementById('trendChart').getContext('2d');
-            trendChartInstance = new Chart(ctxTrend, {
-                type: 'line',
-                data: {
-                    labels: humanReadableDates,
-                    datasets: [
-                        { label: 'Income', data: incomeTimelineValues, borderColor: '#10b981', backgroundColor: 'transparent', borderWidth: 3, tension: 0.2, pointRadius: 4 },
-                        { label: 'Expenses', data: expenseTimelineValues, borderColor: '#ef4444', backgroundColor: 'transparent', borderWidth: 3, tension: 0.2, pointRadius: 4 }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { 
-                        legend: { labels: { color: textColorMain, font: { family: 'inherit', size: 12, weight: '500' } } } 
-                    },
-                    scales: {
-                        x: { grid: { color: borderColorGrid }, ticks: { color: textColorSub } },
-                        y: { grid: { color: borderColorGrid }, ticks: { color: textColorSub } }
-                    }
-                }
+            document.getElementById('themeToggle').addEventListener('click',()=>{
+                const c=document.documentElement.getAttribute('data-theme');
+                const n=c==='dark'?'light':'dark';
+                document.documentElement.setAttribute('data-theme',n);localStorage.setItem('budgetbuddy_theme',n);buildDashboard();
             });
-
-            // --- CHART 2: CATEGORY ALLOCATION RING PIE ---
-            const activeCategories = Object.keys(categoryTotals).filter(cat => categoryTotals[cat] > 0);
-            const activeCategoryValues = activeCategories.map(cat => categoryTotals[cat]);
-
-            if (activeCategoryValues.length === 0) {
-                categoryWrapper.innerHTML = '<div class="ux-empty-placeholder">No categorical expense allocations available to chart yet.</div>';
-            } else {
-                const ctxCat = document.getElementById('categoryChart').getContext('2d');
-                categoryChartInstance = new Chart(ctxCat, {
-                    type: 'doughnut',
-                    data: {
-                        labels: activeCategories,
-                        datasets: [{
-                            data: activeCategoryValues,
-                            backgroundColor: ['#38bdf8', '#fb923c', '#f43f5e', '#34d399', '#a78bfa'],
-                            borderWidth: 0
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                                labels: { color: textColorMain, padding: 16, font: { family: 'inherit', size: 12 } }
-                            }
-                        },
-                        cutout: '72%'
-                    }
-                });
-            }
-        }
-
-        // Global Utility Functions for App Management Controls
-        function clearAllData() {
-            if (confirm('Are you completely sure you want to delete all entries? This cannot be undone.')) {
-                localStorage.removeItem('budgetbuddy_data');
-                compileAndBuildAnalyticsLayout();
-            }
-        }
-
-        function copyBackup() {
-            const data = localStorage.getItem('budgetbuddy_data') || '[]';
-            if (data === '[]') {
-                alert('You do not have any data entries to backup yet!');
-                return;
-            }
-            navigator.clipboard.writeText(JSON.stringify(JSON.parse(data), null, 2))
-                .then(() => alert('Your data backup code has been copied to your clipboard! Paste it safely somewhere else.'))
-                .catch(() => alert('Could not copy details code. Please inspect browser safety parameters.'));
-        }
-
-        // App lifecycle initialization logic mapping triggers
-        document.addEventListener('DOMContentLoaded', () => {
-            const savedTheme = localStorage.getItem('budgetbuddy_theme');
-            if (savedTheme) {
-                document.documentElement.setAttribute('data-theme', savedTheme);
-            } else {
-                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
-            }
-            
-            compileAndBuildAnalyticsLayout();
-
-            // Hook utility interface actions inside DOM elements directly
-            document.getElementById('btnReset').addEventListener('click', clearAllData);
-            document.getElementById('btnExport').addEventListener('click', copyBackup);
-
-            const themeToggleBtn = document.getElementById('themeToggle');
-            if (themeToggleBtn) {
-                themeToggleBtn.addEventListener('click', () => {
-                    const activeTheme = document.documentElement.getAttribute('data-theme');
-                    const targetTheme = activeTheme === 'dark' ? 'light' : 'dark';
-                    
-                    document.documentElement.setAttribute('data-theme', targetTheme);
-                    localStorage.setItem('budgetbuddy_theme', targetTheme);
-                    
-                    compileAndBuildAnalyticsLayout();
-                });
-            }
+            if(!document.getElementById('bg-aura')){const a=document.createElement('div');a.id='bg-aura';document.body.prepend(a);}
         });
     </script>
 </body>
